@@ -1,91 +1,393 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- theme #f3ebe3 #9a3412 #f6e6d8 #ead7c6 #9a3412 -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Folio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root { --wash:#f3ebe3; --shell:#fbf7f4; --ink:#2a211c; --muted:#8a7b70; --line:#efe4da; --accent:#9a3412; --soft:#f8e6d8; --down:#d4534b; }
-    * { box-sizing:border-box; } body { margin:0; min-height:100vh; font-family:Inter,"Segoe UI",sans-serif; color:var(--ink); background:radial-gradient(900px 480px at 10% -10%, #fff, var(--wash)); }
-    .shell { width:min(1120px, calc(100% - 40px)); margin:28px auto; min-height:760px; display:grid; grid-template-columns:84px 1fr; background:var(--shell); border-radius:28px; box-shadow:0 24px 60px rgba(80,40,20,.08); }
-    .rail { padding:22px 0; display:flex; justify-content:center; }
-    .mark { width:44px; height:44px; border-radius:14px; background:var(--soft); color:var(--accent); display:grid; place-items:center; }
-    .content { padding:28px 28px 28px 6px; }
-    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-    h1 { margin:0; font-size:28px; letter-spacing:-.03em; } .sub { margin:4px 0 0; color:var(--muted); font-size:14px; }
-    .search { display:flex; gap:8px; align-items:center; } .search input { width:220px; border:0; background:#fff; border-radius:999px; padding:12px 16px; font:inherit; }
-    .go { width:42px; height:42px; border-radius:50%; border:0; background:#1c1c1c; color:#fff; cursor:pointer; }
-    .stats, .grid { display:grid; gap:14px; margin-top:16px; } .stats { grid-template-columns:repeat(3,1fr); } .grid { grid-template-columns:1fr 1fr; }
-    .stat, .panel { background:#fff; border-radius:18px; padding:16px 18px; }
-    .stat .k { color:var(--muted); font-size:13px; } .stat b { display:block; margin-top:10px; font-size:30px; }
-    h2 { margin:0 0 8px; font-size:16px; } label { display:block; margin:10px 0 4px; font-size:12px; color:var(--muted); }
-    input, textarea, button { font:inherit; } input, textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
-    textarea { min-height:90px; }
-    button.primary, button.quiet { border:0; border-radius:12px; padding:10px 14px; cursor:pointer; }
-    button.primary { background:var(--accent); color:#fff; } button.quiet { background:var(--soft); }
-    table { width:100%; border-collapse:collapse; } td { padding:10px 0; border-bottom:1px solid var(--line); vertical-align:top; }
-    .error { color:var(--down); }
-    @media (max-width:900px) { .shell { grid-template-columns:1fr; } .stats, .grid, .top { display:grid; grid-template-columns:1fr; } }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>:root {
+  --wash: #f3ebe3;
+  --ink: #1b1d1f;
+  --muted: #8b928a;
+  --line: #eef1ee;
+  --card: #ffffff;
+  --accent: #9a3412;
+  --soft: #f6e6d8;
+  --bar: #ead7c6;
+  --hot: #9a3412;
+  --up: #1f9d55;
+  --down: #e11d48;
+  --peach: #f0c7a4;
+  --lilac: #c9c3e6;
+  --sky: #b7d4ef;
+  --shadow: 0 12px 32px rgba(28, 40, 24, 0.05);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  color: var(--ink);
+  background: var(--wash);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+::selection { background: var(--soft); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #d5ddd4; border-radius: 99px; }
+
+.frame {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 6px;
+  padding: 18px 22px 22px 16px;
+}
+.rail {
+  background: var(--card);
+  border-radius: 30px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0 14px;
+  position: sticky;
+  top: 18px;
+  height: calc(100vh - 36px);
+}
+.rail button, .mark {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: #8d948c;
+  display: grid;
+  place-items: center;
+}
+.rail nav { display: flex; flex-direction: column; gap: 6px; margin-top: 18px; }
+.rail button.on, .rail button:hover { background: #1c1f1c; color: #fff; }
+.grow { flex: 1; }
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+.stage { padding: 8px 8px 8px 12px; min-width: 0; }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.greet { display: flex; align-items: center; gap: 12px; }
+.badge-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+}
+h1 { margin: 0; font-size: 30px; letter-spacing: -0.04em; font-weight: 700; }
+.sub { margin: 3px 0 0; color: var(--muted); font-size: 13.5px; }
+.tools { display: flex; align-items: center; gap: 10px; }
+.finder {
+  height: 48px;
+  min-width: 260px;
+  background: #fff;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 4px 4px 4px 16px;
+  box-shadow: var(--shadow);
+}
+.finder input::placeholder { color: #b0b6ae; }
+.go, .round {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  display: grid;
+  place-items: center;
+}
+.go { background: #1c1f1c; color: #fff; }
+.round { background: #fff; color: #6d746c; box-shadow: var(--shadow); position: relative; }
+.dot {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 1.5px solid #fff;
+}
+.stats, .split { display: grid; gap: 16px; margin-top: 18px; }
+.stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.split { grid-template-columns: 1.35fr 0.9fr; }
+.card {
+  background: var(--card);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px 14px;
+  min-width: 0;
+}
+.stat-top, .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.stat-label { display: flex; align-items: center; gap: 8px; color: #667064; font-size: 13px; font-weight: 600; }
+.ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+}
+.stat b { display: block; margin: 14px 0 6px; font-size: 30px; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; }
+.trend { font-size: 12px; font-weight: 700; }
+.trend.up { color: var(--up); }
+.trend.down { color: var(--down); }
+.trend em { font-style: normal; color: var(--muted); font-weight: 500; margin-left: 6px; }
+h2 { margin: 0; font-size: 16px; letter-spacing: -0.02em; }
+.linkish { border: 0; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; }
+.chart { display: flex; gap: 8px; height: 176px; margin-top: 14px; }
+.yaxis { display: flex; flex-direction: column; justify-content: space-between; color: #b0b6ae; font-size: 11px; padding-bottom: 22px; }
+.plot { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.bars { flex: 1; display: flex; align-items: flex-end; gap: 12px; border-bottom: 1px dashed #e6ebe4; }
+.col { flex: 1; display: flex; align-items: flex-end; height: 100%; }
+.bar {
+  width: 100%;
+  border-radius: 12px 12px 8px 8px;
+  background: var(--bar);
+  min-height: 8px;
+}
+.bar.hot {
+  background: repeating-linear-gradient(-45deg, var(--hot), var(--hot) 5px, #f4f7f2 5px, #f4f7f2 8px);
+}
+.days { display: flex; gap: 12px; margin-top: 8px; }
+.days span { flex: 1; text-align: center; color: #a3aaa2; font-size: 12px; }
+.donut-row { display: flex; align-items: center; gap: 18px; min-height: 176px; }
+.donut { position: relative; width: 148px; height: 148px; flex: none; }
+.donut svg { width: 148px; height: 148px; transform: rotate(-90deg); }
+.donut strong {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+}
+.legend { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #667064; }
+.legend div { display: flex; align-items: center; gap: 8px; }
+.swatch { width: 8px; height: 8px; border-radius: 50%; }
+.list { display: flex; flex-direction: column; }
+.item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+.item:first-child { border-top: 0; }
+.item b { display: block; font-size: 14px; }
+.item .sub { font-size: 12px; }
+.amt { color: var(--up); font-weight: 700; font-variant-numeric: tabular-nums; }
+.pill {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+.who { display: flex; align-items: center; gap: 8px; color: #4e564e; font-size: 13px; font-weight: 600; }
+.who .avatar { width: 28px; height: 28px; font-size: 12px; }
+.empty { color: var(--muted); padding: 18px 0; font-size: 14px; }
+.work { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+label { display: block; margin: 10px 0 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+input, select, textarea {
+  width: 100%;
+  border: 0;
+  background: #f3f6f2;
+  border-radius: 12px;
+  padding: 12px 12px;
+}
+textarea { min-height: 84px; resize: vertical; }
+.finder input { width: auto; flex: 1; border: 0; outline: 0; background: transparent; padding: 0; min-width: 0; }
+pre { white-space: pre-wrap; background: #f3f6f2; border-radius: 12px; padding: 12px; font-size: 12px; margin: 8px 0 0; }
+[hidden] { display: none !important; }
+.actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.primary, .quiet {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  font-weight: 700;
+}
+.primary { background: #1c1f1c; color: #fff; }
+.quiet { background: var(--soft); color: var(--ink); }
+.error { color: var(--down); min-height: 1.2em; font-size: 13px; font-weight: 600; }
+.signin { max-width: 520px; margin-top: 28px; }
+@media (max-width: 980px) {
+  .frame { grid-template-columns: 1fr; padding: 12px; }
+  .rail { position: static; height: auto; flex-direction: row; border-radius: 22px; padding: 10px 12px; overflow: auto; }
+  .rail nav { flex-direction: row; margin: 0 0 0 8px; }
+  .grow { display: none; }
+  .head, .stats, .split, .work { display: grid; grid-template-columns: 1fr; }
+  .finder { min-width: 0; }
+  .donut-row { flex-wrap: wrap; }
+}
+</style>
 </head>
 <body>
-  <div class="shell">
-    <aside class="rail"><div class="mark" title="Folio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h9l3 3v13H7z"/><path d="M16 4v3h3M9 12h6M9 16h4"/></svg></div></aside>
-    <main class="content">
-      <div class="top">
-        <div><h1>Hello</h1><p class="sub">Documents with more of the query terms come first.</p></div>
-        <div class="search"><input id="q" placeholder="Search anything..." value="bay whale"><button class="go" id="search">⌕</button></div>
+  <div class="frame">
+    <aside class="rail">
+      <div class="mark" title="Folio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h6a3 3 0 0 1 3 3v13H8a3 3 0 0 0-3 3zM19 4h-6a3 3 0 0 0-3 3"/></svg></div>
+      <nav>
+        <button class="on" data-view="home" title="Desk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5M7 10v9h10v-9"/></svg></button>
+        <button data-view="edit" title="Documents"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7zM14 3v5h5"/></svg></button>
+      </nav>
+      <div class="grow"></div>
+      <div class="avatar">F</div>
+    </aside>
+    <main class="stage">
+      <header class="head">
+        <div class="greet">
+          <div class="badge-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h6a3 3 0 0 1 3 3v13H8a3 3 0 0 0-3 3zM19 4h-6"/></svg></div>
+          <div>
+            <h1>Hello</h1>
+            <p class="sub">Documents, ranked by how many of your words they contain.</p>
+          </div>
+        </div>
+        <div class="tools">
+          <div class="finder">
+            <input id="q" placeholder="Search Anything..." value="bay whale">
+            <button class="go" id="search" title="Search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM21 21l-4.3-4.3"/></svg></button>
+          </div>
+          <button class="round" data-open="edit" title="Add a document"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 7 3 7H3s3 0 3-7M10 20a2 2 0 0 0 4 0"/></svg></button>
+        </div>
+      </header>
+      <div id="view-home">
+        <section class="stats">
+          <article class="card"><div class="stat-label"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/></svg></span>Documents</div><b id="n-docs">0</b><div class="trend up">stored <em>in this index</em></div></article>
+          <article class="card"><div class="stat-label"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM21 21l-4.3-4.3"/></svg></span>Matches</div><b id="n-hits">0</b><div class="trend up">for this query <em id="query-note">bay whale</em></div></article>
+          <article class="card"><div class="stat-label"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/></svg></span>Best score</div><b id="n-best">–</b><div class="trend up">distinct words</div></article>
+        </section>
+        <section class="split">
+          <article class="card">
+            <div class="card-top"><h2>Rank</h2><span class="sub">Score of each match</span></div>
+            <div class="chart"><div class="yaxis"><span id="ymax">0</span><span id="ymid">0</span><span>0</span></div><div class="plot"><div class="bars" id="bars"></div><div class="days" id="days"></div></div></div>
+          </article>
+          <article class="card">
+            <div class="card-top"><h2>Coverage</h2><button class="linkish" data-open="edit">See all</button></div>
+            <div class="donut-row">
+              <div class="donut">
+                <svg viewBox="0 0 148 148"><circle cx="74" cy="74" r="54" fill="none" stroke="#eef2ea" stroke-width="16"></circle><circle id="arc-a" cx="74" cy="74" r="54" fill="none" stroke="var(--accent)" stroke-width="16"></circle><circle id="arc-b" cx="74" cy="74" r="54" fill="none" stroke="var(--lilac)" stroke-width="16"></circle></svg>
+                <strong id="donut-center">0</strong>
+              </div>
+              <div class="legend">
+                <div><i class="swatch" style="background:var(--accent)"></i><span id="legend-a">Matches · 0</span></div>
+                <div><i class="swatch" style="background:var(--lilac)"></i><span id="legend-b">Other · 0</span></div>
+              </div>
+            </div>
+          </article>
+        </section>
+        <section class="split">
+          <article class="card">
+            <div class="card-top"><h2>Matches</h2><button class="linkish" id="search-again">See all</button></div>
+            <div class="list" id="hits"><p class="empty">No matches yet.</p></div>
+          </article>
+          <article class="card">
+            <div class="card-top"><h2>Documents</h2><button class="linkish" data-open="edit">See all</button></div>
+            <div class="list" id="docs"><p class="empty">No documents yet.</p></div>
+            <p class="error" id="err"></p>
+          </article>
+        </section>
       </div>
-      <div class="stats">
-        <article class="stat"><div class="k">Documents</div><b id="n-docs">0</b></article>
-        <article class="stat"><div class="k">Matches</div><b id="n-hits">0</b></article>
-        <article class="stat"><div class="k">Best score</div><b id="n-best">–</b></article>
-      </div>
-      <div class="grid">
-        <section class="panel">
-          <h2>Add a document</h2>
+      <div class="work" id="view-edit" hidden>
+        <article class="card">
+          <h2>Document</h2>
           <label>Id</label><input id="id" value="a">
           <label>Text</label><textarea id="text">blue whale in the bay</textarea>
-          <p><button class="primary" id="add">Save</button></p>
-          <p class="error" id="err"></p>
-        </section>
-        <section class="panel">
-          <h2>Matches</h2>
-          <table><tbody id="hits"></tbody></table>
-        </section>
+          <div class="actions"><button class="primary" id="add">Save</button></div>
+        </article>
       </div>
-      <section class="panel" style="margin-top:14px">
-        <h2>Library</h2>
-        <table><tbody id="docs"></tbody></table>
-      </section>
     </main>
   </div>
   <script>
     const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+    let docs = [];
+    function show(name) {
+      document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("on", button.dataset.view === name));
+      ["home", "edit"].forEach((view) => { $("view-" + view).hidden = view !== name; });
+    }
+    function bars(values, labels) {
+      const v = values.slice(0, 7);
+      const l = labels.slice(0, 7);
+      while (v.length < 7) { v.push(0); l.push("·"); }
+      const peak = Math.max(1, ...v);
+      let hot = 0;
+      v.forEach((n, i) => { if (n >= v[hot]) hot = i; });
+      $("ymax").textContent = peak;
+      $("ymid").textContent = Math.round(peak / 2);
+      $("bars").innerHTML = v.map((n, i) => '<div class="col"><div class="bar' + (n > 0 && i === hot ? " hot" : "") + '" style="height:' + (n ? Math.max(22, (n / peak) * 100) : 16) + '%"></div></div>').join("");
+      $("days").innerHTML = l.map((name) => "<span>" + esc(String(name).slice(0, 3)) + "</span>").join("");
+    }
+    function donut(hits, rest) {
+      const total = (hits + rest) || 1;
+      const c = 2 * Math.PI * 54;
+      const len = (hits / total) * c;
+      $("arc-a").setAttribute("stroke-dasharray", len + " " + (c - len));
+      $("arc-b").setAttribute("stroke-dasharray", (c - len) + " " + len);
+      $("arc-b").setAttribute("stroke-dashoffset", String(-len));
+      $("donut-center").textContent = String(hits);
+      $("legend-a").textContent = "Matches · " + hits;
+      $("legend-b").textContent = "Other · " + rest;
+    }
     async function load() {
-      const docs = await (await fetch("/v1/docs")).json();
+      docs = await (await fetch("/v1/docs")).json();
       $("n-docs").textContent = docs.length;
-      $("docs").innerHTML = docs.map((doc) => "<tr><td><b>" + doc.id + "</b><div class='sub'>" + doc.text + "</div></td><td><button class='quiet drop' data-id='" + doc.id + "'>Remove</button></td></tr>").join("");
-      document.querySelectorAll(".drop").forEach((button) => button.onclick = async () => { await fetch("/v1/docs/" + button.dataset.id, { method:"DELETE" }); load(); search(); });
+      const q = $("q").value.toLowerCase();
+      const shown = docs.filter((doc) => !q || doc.id.toLowerCase().includes(q) || doc.text.toLowerCase().includes(q));
+      $("docs").innerHTML = shown.length ? shown.map((doc) => '<div class="item"><div class="avatar">' + esc(doc.id.slice(0, 1).toUpperCase()) + '</div><div><b>' + esc(doc.id) + '</b><div class="sub">' + esc(doc.text) + '</div></div><button class="pill drop" data-id="' + esc(doc.id) + '">Remove</button></div>').join("") : '<p class="empty">No documents yet.</p>';
+      document.querySelectorAll(".drop").forEach((button) => button.onclick = async () => { await fetch("/v1/docs/" + button.dataset.id, { method:"DELETE" }); await load(); await search(); });
     }
     async function search() {
       const response = await fetch("/v1/search?q=" + encodeURIComponent($("q").value));
       const text = await response.text();
       if (!response.ok) { $("err").textContent = text; return; }
+      $("err").textContent = "";
       const hits = JSON.parse(text);
       $("n-hits").textContent = hits.length;
       $("n-best").textContent = hits.length ? hits[0].terms : "–";
-      $("hits").innerHTML = hits.map((hit) => "<tr><td><b>" + hit.id + "</b></td><td>" + hit.terms + " terms</td></tr>").join("");
+      $("query-note").textContent = $("q").value || "this query";
+      $("hits").innerHTML = hits.length ? hits.map((hit) => '<div class="item"><div class="avatar">' + esc(String(hit.id).slice(0, 1).toUpperCase()) + '</div><div><b>' + esc(hit.id) + '</b><div class="sub">matching words</div></div><div class="amt">' + esc(hit.terms) + "</div></div>").join("") : '<p class="empty">No matches yet.</p>';
+      bars(hits.map((hit) => Number(hit.terms) || 0), hits.map((hit) => hit.id));
+      donut(hits.length, Math.max(docs.length - hits.length, 0));
     }
     $("add").onclick = async () => {
       $("err").textContent = "";
       const response = await fetch("/v1/docs/" + $("id").value, { method:"PUT", body:$("text").value });
       if (!response.ok) { $("err").textContent = await response.text(); return; }
-      await load(); await search();
+      show("home");
+      await load();
+      await search();
     };
-    $("search").onclick = search;
-    load();
+    $("search").onclick = () => search();
+    $("search-again").onclick = () => search();
+    $("q").oninput = () => load();
+    document.querySelectorAll("[data-view]").forEach((button) => button.onclick = () => show(button.dataset.view));
+    document.querySelectorAll("[data-open]").forEach((button) => button.onclick = () => show(button.dataset.open));
+    bars([0, 0, 0, 0, 0, 0, 0], ["·", "·", "·", "·", "·", "·", "·"]);
+    load().then(search);
   </script>
 </body>
 </html>
