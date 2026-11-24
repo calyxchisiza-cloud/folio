@@ -160,6 +160,24 @@ func (idx *Index) Search(query string) ([]Hit, error) {
 	return hits, nil
 }
 
+// Document is one stored text.
+type Document struct {
+	ID   string `json:"id"`
+	Text string `json:"text"`
+}
+
+// Documents lists every stored text, ordered by id.
+func (idx *Index) Documents() []Document {
+	idx.mu.Lock()
+	defer idx.mu.Unlock()
+	docs := make([]Document, 0, len(idx.docs))
+	for id, text := range idx.docs {
+		docs = append(docs, Document{ID: id, Text: text})
+	}
+	sort.Slice(docs, func(i, j int) bool { return docs[i].ID < docs[j].ID })
+	return docs
+}
+
 func (idx *Index) replay(raw []byte) error {
 	if len(raw) > 0 && raw[len(raw)-1] != '\n' {
 		cut := bytes.LastIndexByte(raw, '\n')

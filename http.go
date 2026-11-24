@@ -1,6 +1,7 @@
 package folio
 
 import (
+	_ "embed"
 	"encoding/json"
 	"io"
 	"net"
@@ -8,9 +9,20 @@ import (
 	"time"
 )
 
-// Handler serves documents and search.
+//go:embed index.html
+var indexHTML []byte
+
+// Handler serves documents, search, and the management page.
 func Handler(idx *Index) http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write(indexHTML)
+	})
+	mux.HandleFunc("GET /v1/docs", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(idx.Documents())
+	})
 	mux.HandleFunc("PUT /v1/docs/{id}", func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(io.LimitReader(r.Body, maxText+1))
 		if err != nil {

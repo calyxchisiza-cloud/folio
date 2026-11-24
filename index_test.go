@@ -106,3 +106,21 @@ func TestEmptyQuery(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 }
+
+func TestPageAndDocuments(t *testing.T) {
+	idx := New()
+	if err := idx.Add("a", "blue whale"); err != nil {
+		t.Fatal(err)
+	}
+	h := Handler(idx)
+	page := httptest.NewRecorder()
+	h.ServeHTTP(page, httptest.NewRequest(http.MethodGet, "/", nil))
+	if page.Code != http.StatusOK || !strings.Contains(page.Body.String(), "Hello") {
+		t.Fatalf("page %d", page.Code)
+	}
+	docs := httptest.NewRecorder()
+	h.ServeHTTP(docs, httptest.NewRequest(http.MethodGet, "/v1/docs", nil))
+	if docs.Code != http.StatusOK || !strings.Contains(docs.Body.String(), `"id":"a"`) {
+		t.Fatalf("%d %s", docs.Code, docs.Body.String())
+	}
+}

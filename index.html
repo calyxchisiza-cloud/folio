@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Folio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --wash:#f3ebe3; --shell:#fbf7f4; --ink:#2a211c; --muted:#8a7b70; --line:#efe4da; --accent:#9a3412; --soft:#f8e6d8; --down:#d4534b; }
+    * { box-sizing:border-box; } body { margin:0; min-height:100vh; font-family:Inter,"Segoe UI",sans-serif; color:var(--ink); background:radial-gradient(900px 480px at 10% -10%, #fff, var(--wash)); }
+    .shell { width:min(1120px, calc(100% - 40px)); margin:28px auto; min-height:760px; display:grid; grid-template-columns:84px 1fr; background:var(--shell); border-radius:28px; box-shadow:0 24px 60px rgba(80,40,20,.08); }
+    .rail { padding:22px 0; display:flex; justify-content:center; }
+    .mark { width:44px; height:44px; border-radius:14px; background:var(--soft); color:var(--accent); display:grid; place-items:center; }
+    .content { padding:28px 28px 28px 6px; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    h1 { margin:0; font-size:28px; letter-spacing:-.03em; } .sub { margin:4px 0 0; color:var(--muted); font-size:14px; }
+    .search { display:flex; gap:8px; align-items:center; } .search input { width:220px; border:0; background:#fff; border-radius:999px; padding:12px 16px; font:inherit; }
+    .go { width:42px; height:42px; border-radius:50%; border:0; background:#1c1c1c; color:#fff; cursor:pointer; }
+    .stats, .grid { display:grid; gap:14px; margin-top:16px; } .stats { grid-template-columns:repeat(3,1fr); } .grid { grid-template-columns:1fr 1fr; }
+    .stat, .panel { background:#fff; border-radius:18px; padding:16px 18px; }
+    .stat .k { color:var(--muted); font-size:13px; } .stat b { display:block; margin-top:10px; font-size:30px; }
+    h2 { margin:0 0 8px; font-size:16px; } label { display:block; margin:10px 0 4px; font-size:12px; color:var(--muted); }
+    input, textarea, button { font:inherit; } input, textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+    textarea { min-height:90px; }
+    button.primary, button.quiet { border:0; border-radius:12px; padding:10px 14px; cursor:pointer; }
+    button.primary { background:var(--accent); color:#fff; } button.quiet { background:var(--soft); }
+    table { width:100%; border-collapse:collapse; } td { padding:10px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+    .error { color:var(--down); }
+    @media (max-width:900px) { .shell { grid-template-columns:1fr; } .stats, .grid, .top { display:grid; grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail"><div class="mark" title="Folio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h9l3 3v13H7z"/><path d="M16 4v3h3M9 12h6M9 16h4"/></svg></div></aside>
+    <main class="content">
+      <div class="top">
+        <div><h1>Hello</h1><p class="sub">Documents with more of the query terms come first.</p></div>
+        <div class="search"><input id="q" placeholder="Search anything..." value="bay whale"><button class="go" id="search">⌕</button></div>
+      </div>
+      <div class="stats">
+        <article class="stat"><div class="k">Documents</div><b id="n-docs">0</b></article>
+        <article class="stat"><div class="k">Matches</div><b id="n-hits">0</b></article>
+        <article class="stat"><div class="k">Best score</div><b id="n-best">–</b></article>
+      </div>
+      <div class="grid">
+        <section class="panel">
+          <h2>Add a document</h2>
+          <label>Id</label><input id="id" value="a">
+          <label>Text</label><textarea id="text">blue whale in the bay</textarea>
+          <p><button class="primary" id="add">Save</button></p>
+          <p class="error" id="err"></p>
+        </section>
+        <section class="panel">
+          <h2>Matches</h2>
+          <table><tbody id="hits"></tbody></table>
+        </section>
+      </div>
+      <section class="panel" style="margin-top:14px">
+        <h2>Library</h2>
+        <table><tbody id="docs"></tbody></table>
+      </section>
+    </main>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    async function load() {
+      const docs = await (await fetch("/v1/docs")).json();
+      $("n-docs").textContent = docs.length;
+      $("docs").innerHTML = docs.map((doc) => "<tr><td><b>" + doc.id + "</b><div class='sub'>" + doc.text + "</div></td><td><button class='quiet drop' data-id='" + doc.id + "'>Remove</button></td></tr>").join("");
+      document.querySelectorAll(".drop").forEach((button) => button.onclick = async () => { await fetch("/v1/docs/" + button.dataset.id, { method:"DELETE" }); load(); search(); });
+    }
+    async function search() {
+      const response = await fetch("/v1/search?q=" + encodeURIComponent($("q").value));
+      const text = await response.text();
+      if (!response.ok) { $("err").textContent = text; return; }
+      const hits = JSON.parse(text);
+      $("n-hits").textContent = hits.length;
+      $("n-best").textContent = hits.length ? hits[0].terms : "–";
+      $("hits").innerHTML = hits.map((hit) => "<tr><td><b>" + hit.id + "</b></td><td>" + hit.terms + " terms</td></tr>").join("");
+    }
+    $("add").onclick = async () => {
+      $("err").textContent = "";
+      const response = await fetch("/v1/docs/" + $("id").value, { method:"PUT", body:$("text").value });
+      if (!response.ok) { $("err").textContent = await response.text(); return; }
+      await load(); await search();
+    };
+    $("search").onclick = search;
+    load();
+  </script>
+</body>
+</html>
